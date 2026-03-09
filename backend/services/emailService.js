@@ -32,7 +32,26 @@ class EmailService {
     console.log("Verification email sent to:", toEmail);
   }
 
+  static async sendPasswordResetEmail(toEmail, token) {
+
+    const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
+  
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: toEmail,
+      subject: "Reset Your Password",
+      html: `
+        <h2>Password Reset</h2>
+        <p>Click below to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>This link expires in 1 hour.</p>
+      `
+    });
+  }
+
 }
+
+
 
 EmailService.transporter.verify((error, success) => {
     if (error) {

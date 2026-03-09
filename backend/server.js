@@ -4,6 +4,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import db from "./config/db.js";
 import authMiddleware from "./middleware/authMiddleware.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,9 @@ app.get("/api/protected", authMiddleware, (req, res) => {
     user: req.user
   });
 });
+
+
+app.use("/api/profile", profileRoutes);
 
 
 app.listen(PORT, () => {

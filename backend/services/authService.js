@@ -5,6 +5,7 @@ import VerificationTokenModel from "../models/verificationTokenModel.js";
 import db from "../config/db.js";
 import jwt from "jsonwebtoken";
 import EmailService from "./emailService.js";
+import PasswordResetTokenModel from "../models/passwordResetTokenModel.js";
 
 const SALT_ROUNDS = 10;
 
@@ -139,6 +140,51 @@ class AuthService {
   static async logout() {
     return { message: "Logged out successfully" };
   }
+
+  // ------------------- FORGOT PASSWORD -------------------
+static async forgotPassword(email) {
+
+  const user = await UserModel.findByEmail(email);
+
+  if (!user) {
+    throw new Error("No account with that email");
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  await PasswordResetTokenModel.createToken(user.id, token, expiresAt);
+
+  await EmailService.sendPasswordResetEmail(email, token);
+
+  return { message: "Password reset email sent" };
+}
+
+// ------------------- RESET PASSWORD -------------------
+static async resetPassword(token, newPassword) {
+
+  const record = await PasswordResetTokenModel.findByToken(token);
+
+  if (!record) {
+    throw new Error("Invalid or expired token");
+  }
+
+  if (new Date(record.expires_at) < new Date()) {
+    throw new Error("Token expired");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  await db.execute(
+    "UPDATE users SET password = ? WHERE id = ?",
+    [hashedPassword, record.user_id]
+  );
+
+  await PasswordResetTokenModel.deleteById(record.id);
+
+  return { message: "Password reset successful" };
+}
 }
 
 export default AuthService;

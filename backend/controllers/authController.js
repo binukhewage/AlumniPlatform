@@ -64,6 +64,28 @@ static async logout(req, res) {
   }
 }
 
+// forgot password
+static async forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    const result = await AuthService.forgotPassword(email);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+// reset password
+static async resetPassword(req, res) {
+  try {
+    const { token, newPassword } = req.body;
+    const result = await AuthService.resetPassword(token, newPassword);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
 }
 
 export default AuthController;

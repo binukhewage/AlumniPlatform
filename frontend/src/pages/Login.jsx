@@ -27,13 +27,9 @@ const Login = () => {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-xl shadow-md w-96"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Alumni Login
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Alumni Login</h2>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <input
           type="email"
@@ -59,6 +55,13 @@ const Login = () => {
         >
           Login
         </button>
+
+        <Link
+          to="/forgot-password"
+          className="text-sm text-blue-600 block my-2 text-end"
+        >
+          Forgot Password?
+        </Link>
 
         <p className="text-sm mt-4 text-center">
           Don’t have an account?{" "}
