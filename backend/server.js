@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import db from "./config/db.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import degreeRoutes from "./routes/degreeRoutes.js";
+import certificationRoutes from "./routes/certificationRoutes.js";
 
 dotenv.config();
 
@@ -40,6 +42,8 @@ app.get("/api/protected", authMiddleware, (req, res) => {
 
 
 app.use("/api/profile", profileRoutes);
+app.use("/api/degrees", degreeRoutes);
+app.use("/api/certifications", certificationRoutes);
 
 
 app.listen(PORT, () => {

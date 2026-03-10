@@ -1,27 +1,32 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
+
         <Route path="/verify-email" element={<VerifyEmail />} />
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
+
         <Route path="/reset-password" element={<ResetPassword />} />
-        
+
+        {/* Protected Profile Page */}
         <Route
-          path="/dashboard"
+          path="/profile"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Profile />
             </ProtectedRoute>
           }
         />
