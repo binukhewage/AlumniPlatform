@@ -1,10 +1,11 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/axios";
 
 const LicencesSection = () => {
 
-  const [items,setItems] = useState([]);
+  const [licences,setLicences] = useState([]);
   const [editingId,setEditingId] = useState(null);
+  const [showForm,setShowForm] = useState(false);
 
   const [form,setForm] = useState({
     licence_name:"",
@@ -13,60 +14,99 @@ const LicencesSection = () => {
     completion_date:""
   });
 
-  const load = async ()=>{
+  const loadLicences = async () => {
 
-    const res = await api.get("/licenses");
-    setItems(res.data);
+    try{
+
+      const res = await api.get("/licences");
+
+      const sorted = res.data.sort((a,b)=> b.id - a.id);
+
+      setLicences(sorted);
+
+    }catch(err){
+
+      console.log("LOAD LICENCES ERROR:",err);
+
+    }
 
   };
 
   useEffect(()=>{
-    load();
+    loadLicences();
   },[]);
 
   const submit = async (e)=>{
 
     e.preventDefault();
 
-    if(editingId){
+    if(!form.licence_name || !form.authority || !form.completion_date){
+      alert("Please fill all required fields");
+      return;
+    }
 
-      await api.put(`/licenses/${editingId}`,form);
+    try{
 
-    }else{
+      if(editingId){
 
-      await api.post("/licenses",form);
+        await api.put(`/licences/${editingId}`,form);
+
+      }else{
+
+        await api.post("/licences",form);
+
+      }
+
+      setEditingId(null);
+
+      setForm({
+        licence_name:"",
+        authority:"",
+        licence_url:"",
+        completion_date:""
+      });
+
+      setShowForm(false);
+
+      loadLicences();
+
+    }catch(err){
+
+      console.log("ADD LICENCE ERROR:",err.response?.data || err);
+
+      alert(err.response?.data?.error || "Failed to add licence");
 
     }
 
-    setEditingId(null);
-    setForm({
-      licence_name:"",
-      authority:"",
-      licence_url:"",
-      completion_date:""
-    });
-
-    load();
-
   };
 
-  const edit = (item)=>{
+  const edit = (licence)=>{
 
-    setEditingId(item.id);
+    setEditingId(licence.id);
+    setShowForm(true);
 
     setForm({
-      licence_name:item.licence_name,
-      authority:item.authority,
-      licence_url:item.licence_url,
-      completion_date:item.completion_date?.substring(0,10)
+      licence_name:licence.licence_name,
+      authority:licence.authority,
+      licence_url:licence.licence_url || "",
+      completion_date:licence.completion_date?.substring(0,10)
     });
 
   };
 
   const remove = async(id)=>{
 
-    await api.delete(`/licenses/${id}`);
-    load();
+    try{
+
+      await api.delete(`/licences/${id}`);
+
+      loadLicences();
+
+    }catch(err){
+
+      console.log("DELETE LICENCE ERROR:",err);
+
+    }
 
   };
 
@@ -74,61 +114,70 @@ const LicencesSection = () => {
 
     <div className="border p-6 rounded space-y-4">
 
-      <h2 className="text-xl font-semibold">Licences</h2>
+      <div className="flex justify-between items-center">
 
-      <form onSubmit={submit} className="space-y-2">
+        <h2 className="text-xl font-semibold">
+          Licences
+        </h2>
 
-        <input
-        placeholder="Licence"
-        className="border p-2 w-full"
-        value={form.licence_name}
-        onChange={(e)=>setForm({...form,licence_name:e.target.value})}
-        />
+        {!showForm && (
+          <button
+            onClick={()=>setShowForm(true)}
+            className="bg-green-600 text-white px-3 py-1 rounded"
+          >
+            Add Licence
+          </button>
+        )}
 
-        <input
-        placeholder="Authority"
-        className="border p-2 w-full"
-        value={form.authority}
-        onChange={(e)=>setForm({...form,authority:e.target.value})}
-        />
+      </div>
 
-        <input
-        placeholder="Licence URL"
-        className="border p-2 w-full"
-        value={form.licence_url}
-        onChange={(e)=>setForm({...form,licence_url:e.target.value})}
-        />
+      {/* LICENCE LIST */}
 
-        <input
-        type="date"
-        className="border p-2 w-full"
-        value={form.completion_date}
-        onChange={(e)=>setForm({...form,completion_date:e.target.value})}
-        />
+      {licences.map(l=>(
+        <div
+          key={l.id}
+          className="flex justify-between border p-3 rounded"
+        >
 
-        <button className="bg-green-600 text-white px-3 py-1 rounded">
-          {editingId ? "Update Licence" : "Add Licence"}
-        </button>
+          <div>
 
-      </form>
+            <p className="font-semibold">
+              {l.licence_name}
+            </p>
 
-      {items.map(i=>(
-        <div key={i.id} className="flex justify-between border p-2 rounded">
+            <p className="text-sm text-gray-600">
+              {l.authority}
+            </p>
 
-          <span>{i.licence_name} - {i.authority}</span>
+            <p className="text-xs text-gray-500">
+              {l.completion_date?.substring(0,10)}
+            </p>
 
-          <div className="space-x-2">
+            {l.licence_url && (
+              <a
+                href={l.licence_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500 text-sm"
+              >
+                View Licence
+              </a>
+            )}
+
+          </div>
+
+          <div className="space-x-3">
 
             <button
-            onClick={()=>edit(i)}
-            className="text-blue-500"
+              onClick={()=>edit(l)}
+              className="text-blue-500"
             >
               Edit
             </button>
 
             <button
-            onClick={()=>remove(i.id)}
-            className="text-red-500"
+              onClick={()=>remove(l.id)}
+              className="text-red-500"
             >
               Delete
             </button>
@@ -137,6 +186,66 @@ const LicencesSection = () => {
 
         </div>
       ))}
+
+      {/* FORM */}
+
+      {showForm && (
+
+        <form onSubmit={submit} className="space-y-2 border-t pt-4">
+
+          <input
+            placeholder="Licence Name"
+            required
+            className="border p-2 w-full"
+            value={form.licence_name}
+            onChange={(e)=>setForm({...form,licence_name:e.target.value})}
+          />
+
+          <input
+            placeholder="Authority"
+            required
+            className="border p-2 w-full"
+            value={form.authority}
+            onChange={(e)=>setForm({...form,authority:e.target.value})}
+          />
+
+          <input
+            placeholder="Licence URL"
+            className="border p-2 w-full"
+            value={form.licence_url}
+            onChange={(e)=>setForm({...form,licence_url:e.target.value})}
+          />
+
+          <input
+            type="date"
+            required
+            className="border p-2 w-full"
+            value={form.completion_date}
+            onChange={(e)=>setForm({...form,completion_date:e.target.value})}
+          />
+
+          <div className="flex gap-2">
+
+            <button className="bg-blue-600 text-white px-4 py-1 rounded">
+              {editingId ? "Update Licence" : "Add Licence"}
+            </button>
+
+            <button
+              type="button"
+              onClick={()=>{
+                setShowForm(false);
+                setEditingId(null);
+              }}
+              className="bg-gray-400 text-white px-4 py-1 rounded"
+            >
+              Cancel
+            </button>
+
+          </div>
+
+        </form>
+
+      )}
 
     </div>
 

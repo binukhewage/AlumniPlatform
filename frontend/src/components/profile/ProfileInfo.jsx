@@ -57,6 +57,8 @@ const ProfileInfo = () => {
         Profile Information
       </h2>
 
+      {/* CREATE PROFILE */}
+
       {!profile && (
 
         <form onSubmit={createProfile} className="space-y-3">
@@ -92,11 +94,23 @@ const ProfileInfo = () => {
 
       )}
 
+      {/* SHOW PROFILE */}
+
       {profile && (
 
-        <div className="space-y-2">
+        <div className="space-y-3">
 
-          <p className="font-medium">
+          {/* PROFILE IMAGE */}
+
+          {profile.profile_image && (
+            <img
+              src={`http://localhost:8080/uploads/${profile.profile_image}`}
+              alt="profile"
+              className="w-28 h-28 rounded-full object-cover border"
+            />
+          )}
+
+          <p className="font-semibold text-lg">
             {profile.full_name}
           </p>
 
@@ -106,11 +120,12 @@ const ProfileInfo = () => {
 
           {profile.linkedin_url && (
             <a
-            href={profile.linkedin_url}
-            target="_blank"
-            className="text-blue-600"
+              href={profile.linkedin_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-600 underline"
             >
-              LinkedIn
+              LinkedIn Profile
             </a>
           )}
 

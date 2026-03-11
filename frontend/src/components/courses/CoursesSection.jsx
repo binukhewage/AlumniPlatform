@@ -1,10 +1,11 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/axios";
 
 const CoursesSection = () => {
 
   const [courses,setCourses] = useState([]);
   const [editingId,setEditingId] = useState(null);
+  const [showForm,setShowForm] = useState(false);
 
   const [form,setForm] = useState({
     course_name:"",
@@ -13,60 +14,102 @@ const CoursesSection = () => {
     completion_date:""
   });
 
-  const load = async ()=>{
+  const loadCourses = async () => {
 
-    const res = await api.get("/courses");
-    setCourses(res.data);
+    try{
+
+      const res = await api.get("/courses");
+
+      const sorted = res.data.sort((a,b)=> b.id - a.id);
+
+      setCourses(sorted);
+
+    }catch(err){
+
+      console.log("LOAD COURSES ERROR:",err);
+
+    }
 
   };
 
   useEffect(()=>{
-    load();
+    loadCourses();
   },[]);
 
   const submit = async (e)=>{
 
     e.preventDefault();
 
-    if(editingId){
+    if(!form.course_name || !form.provider || !form.completion_date){
 
-      await api.put(`/courses/${editingId}`,form);
-
-    }else{
-
-      await api.post("/courses",form);
+      alert("Please fill all required fields");
+      return;
 
     }
 
-    setEditingId(null);
-    setForm({
-      course_name:"",
-      provider:"",
-      course_url:"",
-      completion_date:""
-    });
+    try{
 
-    load();
+      if(editingId){
+
+        await api.put(`/courses/${editingId}`,form);
+
+      }else{
+
+        await api.post("/courses",form);
+
+      }
+
+      setEditingId(null);
+
+      setForm({
+        course_name:"",
+        provider:"",
+        course_url:"",
+        completion_date:""
+      });
+
+      setShowForm(false);
+
+      loadCourses();
+
+    }catch(err){
+
+      console.log("ADD COURSE ERROR:",err.response?.data || err);
+
+      alert(err.response?.data?.error || "Failed to add course");
+
+    }
 
   };
 
-  const edit = (c)=>{
+  const edit = (course)=>{
 
-    setEditingId(c.id);
+    setEditingId(course.id);
+
+    setShowForm(true);
 
     setForm({
-      course_name:c.course_name,
-      provider:c.provider,
-      course_url:c.course_url,
-      completion_date:c.completion_date?.substring(0,10)
+      course_name:course.course_name,
+      provider:course.provider,
+      course_url:course.course_url || "",
+      completion_date:course.completion_date?.substring(0,10)
     });
 
   };
 
   const remove = async(id)=>{
 
-    await api.delete(`/courses/${id}`);
-    load();
+    try{
+
+      await api.delete(`/courses/${id}`);
+
+      loadCourses();
+
+    }catch(err){
+
+      console.log("DELETE COURSE ERROR:",err);
+
+    }
 
   };
 
@@ -74,63 +117,73 @@ const CoursesSection = () => {
 
     <div className="border p-6 rounded space-y-4">
 
-      <h2 className="text-xl font-semibold">
-        Courses
-      </h2>
+      <div className="flex justify-between items-center">
 
-      <form onSubmit={submit} className="space-y-2">
+        <h2 className="text-xl font-semibold">
+          Courses
+        </h2>
 
-        <input
-        placeholder="Course"
-        className="border p-2 w-full"
-        value={form.course_name}
-        onChange={(e)=>setForm({...form,course_name:e.target.value})}
-        />
+        {!showForm && (
+          <button
+            onClick={()=>setShowForm(true)}
+            className="bg-green-600 text-white px-3 py-1 rounded"
+          >
+            Add Course
+          </button>
+        )}
 
-        <input
-        placeholder="Provider"
-        className="border p-2 w-full"
-        value={form.provider}
-        onChange={(e)=>setForm({...form,provider:e.target.value})}
-        />
+      </div>
 
-        <input
-        placeholder="Course URL"
-        className="border p-2 w-full"
-        value={form.course_url}
-        onChange={(e)=>setForm({...form,course_url:e.target.value})}
-        />
+      {/* COURSE LIST */}
 
-        <input
-        type="date"
-        className="border p-2 w-full"
-        value={form.completion_date}
-        onChange={(e)=>setForm({...form,completion_date:e.target.value})}
-        />
+      {courses.map(c => (
 
-        <button className="bg-green-600 text-white px-3 py-1 rounded">
-          {editingId ? "Update Course" : "Add Course"}
-        </button>
+        <div
+          key={c.id}
+          className="flex justify-between border p-3 rounded"
+        >
 
-      </form>
+          <div>
 
-      {courses.map(c=>(
-        <div key={c.id} className="flex justify-between border p-2 rounded">
+            <p className="font-semibold">
+              {c.course_name}
+            </p>
 
-          <span>{c.course_name} - {c.provider}</span>
+            <p className="text-sm text-gray-600">
+              {c.provider}
+            </p>
 
-          <div className="space-x-2">
+            <p className="text-xs text-gray-500">
+              {c.completion_date?.substring(0,10)}
+            </p>
+
+            {c.course_url && (
+
+              <a
+                href={c.course_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500 text-sm"
+              >
+                View Course
+              </a>
+
+            )}
+
+          </div>
+
+          <div className="space-x-3">
 
             <button
-            onClick={()=>edit(c)}
-            className="text-blue-500"
+              onClick={()=>edit(c)}
+              className="text-blue-500"
             >
               Edit
             </button>
 
             <button
-            onClick={()=>remove(c.id)}
-            className="text-red-500"
+              onClick={()=>remove(c.id)}
+              className="text-red-500"
             >
               Delete
             </button>
@@ -138,7 +191,69 @@ const CoursesSection = () => {
           </div>
 
         </div>
+
       ))}
+
+      {/* FORM */}
+
+      {showForm && (
+
+        <form onSubmit={submit} className="space-y-2 border-t pt-4">
+
+          <input
+            placeholder="Course Name"
+            required
+            className="border p-2 w-full"
+            value={form.course_name}
+            onChange={(e)=>setForm({...form,course_name:e.target.value})}
+          />
+
+          <input
+            placeholder="Provider"
+            required
+            className="border p-2 w-full"
+            value={form.provider}
+            onChange={(e)=>setForm({...form,provider:e.target.value})}
+          />
+
+          <input
+            placeholder="Course URL"
+            required
+            className="border p-2 w-full"
+            value={form.course_url}
+            onChange={(e)=>setForm({...form,course_url:e.target.value})}
+          />
+
+          <input
+            type="date"
+            required
+            className="border p-2 w-full"
+            value={form.completion_date}
+            onChange={(e)=>setForm({...form,completion_date:e.target.value})}
+          />
+
+          <div className="flex gap-2">
+
+            <button className="bg-blue-600 text-white px-4 py-1 rounded">
+              {editingId ? "Update Course" : "Add Course"}
+            </button>
+
+            <button
+              type="button"
+              onClick={()=>{
+                setShowForm(false);
+                setEditingId(null);
+              }}
+              className="bg-gray-400 text-white px-4 py-1 rounded"
+            >
+              Cancel
+            </button>
+
+          </div>
+
+        </form>
+
+      )}
 
     </div>
 
