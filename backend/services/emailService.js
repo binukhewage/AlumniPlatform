@@ -49,6 +49,48 @@ class EmailService {
     });
   }
 
+
+  /* ---------------- BID STATUS EMAIL ---------------- */
+
+  static async sendBidStatus(toEmail, status) {
+
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: toEmail,
+      subject: "Your Bid Status Update",
+      html: `
+        <h2>Bid Status Update</h2>
+        <p>Your current bid status is:</p>
+        <h3>${status.toUpperCase()}</h3>
+        <p>You can increase your bid if you want to improve your chances of becoming Alumni of the Day.</p>
+      `
+    });
+
+    console.log("Bid status email sent:", status, "to", toEmail);
+
+  }
+
+
+  /* ---------------- WINNER EMAIL ---------------- */
+
+  static async sendWinnerNotification(toEmail) {
+
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: toEmail,
+      subject: "🎉 Congratulations! You are Alumni of the Day",
+      html: `
+        <h2>Congratulations!</h2>
+        <p>Your bid has won today's Alumni of the Day slot.</p>
+        <p>Your profile will be featured on the platform for students to see.</p>
+        <p>Thank you for participating in the Alumni Influencer program.</p>
+      `
+    });
+
+    console.log("Winner notification email sent to:", toEmail);
+
+  }
+
 }
 
 
@@ -60,7 +102,5 @@ EmailService.transporter.verify((error, success) => {
       console.log("SMTP READY");
     }
   });
-
-
 
 export default EmailService;

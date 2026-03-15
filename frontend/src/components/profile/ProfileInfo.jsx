@@ -16,37 +16,68 @@ const ProfileInfo = () => {
   const loadProfile = async () => {
 
     try{
+  
       const res = await api.get("/profile");
+  
       setProfile(res.data);
+  
+    }catch(error){
+  
+      // Only show create form if profile truly does not exist
+      if(error.response?.status === 404){
+        setProfile(null);
+      }else{
+        console.log("Profile fetch error:", error);
+      }
+  
     }
-    catch{
-      setProfile(null);
-    }
-
+  
   };
 
   useEffect(()=>{
     loadProfile();
   },[]);
 
-  const createProfile = async (e)=>{
+  const createProfile = async (e) => {
 
     e.preventDefault();
+  
+    try {
+  
+      const formData = new FormData();
+  
+      formData.append("full_name", form.full_name);
+      formData.append("bio", form.bio);
+      formData.append("linkedin_url", form.linkedin_url);
+  
+      if (image) {
+        formData.append("profile_image", image);
+      }
+  
+      await api.post("/profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+  
+      loadProfile();
 
-    const formData = new FormData();
-
-    formData.append("full_name",form.full_name);
-    formData.append("bio",form.bio);
-    formData.append("linkedin_url",form.linkedin_url);
-
-    if(image){
-      formData.append("profile_image",image);
+      setForm({
+        full_name:"",
+        bio:"",
+        linkedin_url:""
+      });
+      
+      setImage(null);
+  
+    } catch (err) {
+  
+      console.log("PROFILE CREATE ERROR:", err.response?.data || err);
+  
+      alert(err.response?.data?.error || "Profile creation failed");
+  
     }
-
-    await api.post("/profile",formData);
-
-    loadProfile();
-
+  
   };
 
   return (
