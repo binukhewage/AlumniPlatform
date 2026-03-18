@@ -3,6 +3,33 @@ import db from "../config/db.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /public/featured:
+ *   get:
+ *     summary: Get today's featured alumnus (Alumni of the Day)
+ *     tags: [Public API]
+ *     responses:
+ *       200:
+ *         description: Returns the featured alumnus profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 full_name:
+ *                   type: string
+ *                   example: John Smith
+ *                 bio:
+ *                   type: string
+ *                   example: Software Engineer passionate about cloud technologies
+ *                 linkedin_url:
+ *                   type: string
+ *                   example: https://linkedin.com/in/johnsmith
+ *                 profile_image:
+ *                   type: string
+ *                   example: http://localhost:8080/uploads/profile.jpg
+ */
 router.get("/featured", async (req, res) => {
 
   try{

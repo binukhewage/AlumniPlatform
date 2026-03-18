@@ -2,9 +2,8 @@ import CertificationService from "../services/certificationService.js";
 
 class CertificationController {
 
-  static async addCertification(req,res){
-
-    try{
+  static async addCertification(req, res) {
+    try {
 
       const userId = req.user.userId;
 
@@ -15,29 +14,60 @@ class CertificationController {
 
       res.status(201).json(result);
 
-    }catch(error){
+    } catch (error) {
 
-      res.status(400).json({error:error.message});
+      res.status(400).json({ error: error.message });
 
     }
   }
 
-  static async getCertifications(req,res){
+  static async getCertifications(req, res) {
+    try {
 
-    const userId = req.user.userId;
+      const userId = req.user.userId;
 
-    const certs = await CertificationService.getCertifications(userId);
+      const certs = await CertificationService.getCertifications(userId);
 
-    res.json(certs);
+      res.json(certs);
+
+    } catch (error) {
+
+      res.status(400).json({ error: error.message });
+
+    }
   }
 
-  static async deleteCertification(req,res){
+  static async updateCertification(req, res) {
+    try {
 
-    const result = await CertificationService.deleteCertification(
-      req.params.id
-    );
+      const result = await CertificationService.updateCertification(
+        req.params.id,
+        req.body
+      );
 
-    res.json(result);
+      res.json(result);
+
+    } catch (error) {
+
+      res.status(400).json({ error: error.message });
+
+    }
+  }
+
+  static async deleteCertification(req, res) {
+    try {
+
+      const result = await CertificationService.deleteCertification(
+        req.params.id
+      );
+
+      res.json(result);
+
+    } catch (error) {
+
+      res.status(400).json({ error: error.message });
+
+    }
   }
 
 }

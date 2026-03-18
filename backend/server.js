@@ -17,12 +17,16 @@ import employmentRoutes from "./routes/employmentRoutes.js";
 import bidRoutes from "./routes/bidRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import "./jobs/bidScheduler.js";
+import { swaggerUi, swaggerSpec } from "./config/swagger.js";
 
 dotenv.config();
 
 const app = express();
 
-app.use(helmet());
+// ✅ Allow cross-origin image loading
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors());
 app.use(express.json());
 
@@ -34,6 +38,8 @@ try {
 } catch (error) {
   console.error("Database connection failed:", error);
 }
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /* ---------------- SERVE UPLOADED IMAGES ---------------- */
 
@@ -62,8 +68,8 @@ app.use("/api/certifications", certificationRoutes);
 app.use("/api/licences", licenceRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/employment", employmentRoutes);
-app.use("/api/bids",bidRoutes);
-app.use("/api/public",publicRoutes);
+app.use("/api/bids", bidRoutes);
+app.use("/api/public", publicRoutes);
 
 const PORT = process.env.PORT || 8080;
 

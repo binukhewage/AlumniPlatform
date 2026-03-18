@@ -19,7 +19,14 @@ class CertificationService {
 
     const profile = await ProfileModel.getProfileByUser(userId);
 
-    return CertificationModel.getCertifications(profile.id);
+    return await CertificationModel.getCertifications(profile.id);
+  }
+
+  static async updateCertification(id, data) {
+
+    await CertificationModel.updateCertification(id, data);
+
+    return { message: "Certification updated" };
   }
 
   static async deleteCertification(id) {
