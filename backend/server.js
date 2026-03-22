@@ -18,6 +18,7 @@ import bidRoutes from "./routes/bidRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import "./jobs/bidScheduler.js";
 import { swaggerUi, swaggerSpec } from "./config/swagger.js";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
@@ -29,6 +30,16 @@ app.use(helmet({
 }));
 app.use(cors());
 app.use(express.json());
+
+// ---------- RATE LIMITING ----------------- // 
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    error: "Too many requests, please try again later"
+  }
+});
 
 /* ---------------- DATABASE CONNECTION ---------------- */
 
@@ -51,7 +62,7 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", limiter, authRoutes);
 
 // PROTECTED TEST ROUTE 
 
@@ -68,7 +79,7 @@ app.use("/api/certifications", certificationRoutes);
 app.use("/api/licences", licenceRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/employment", employmentRoutes);
-app.use("/api/bids", bidRoutes);
+app.use("/api/bids", limiter, bidRoutes);
 app.use("/api/public", publicRoutes);
 
 const PORT = process.env.PORT || 8080;
