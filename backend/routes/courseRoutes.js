@@ -67,6 +67,27 @@ router.get("/", authMiddleware, CourseController.getCourses);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Course ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               course_name:
+ *                 type: string
+ *                 example: React Advanced Development
+ *               provider:
+ *                 type: string
+ *                 example: Coursera
+ *               course_url:
+ *                 type: string
+ *                 example: https://coursera.org/react-course
+ *               completion_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2024-03-20
  *     responses:
  *       200:
  *         description: Course updated successfully

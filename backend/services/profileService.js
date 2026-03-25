@@ -4,16 +4,25 @@ class ProfileService {
 
   static async createProfile(userId, data) {
 
+    // Validate LinkedIn URL
     if (data.linkedin_url) {
       const urlRegex = /^(https?:\/\/)/;
-
+  
       if (!urlRegex.test(data.linkedin_url)) {
         throw new Error("Invalid LinkedIn URL");
       }
     }
-
+  
+    // Check if profile already exists
+    const existing = await ProfileModel.getProfileByUser(userId);
+  
+    if (existing) {
+      throw new Error("Profile already exists. Please update instead.");
+    }
+  
+    // Create profile
     const profileId = await ProfileModel.createProfile(userId, data);
-
+  
     return { profileId };
   }
 

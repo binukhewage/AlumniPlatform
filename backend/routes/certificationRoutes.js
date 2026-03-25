@@ -12,6 +12,31 @@ const router = express.Router();
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - certification_name
+ *             properties:
+ *               certification_name:
+ *                 type: string
+ *                 example: AWS Certified Developer
+ *               organisation:
+ *                 type: string
+ *                 example: Amazon
+ *               cert_url:
+ *                 type: string
+ *                 example: https://aws.amazon.com
+ *               completion_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2024-01-01
+ *     responses:
+ *       201:
+ *         description: Certification added successfully
  */
 router.post("/", authMiddleware, CertificationController.addCertification);
 
@@ -24,6 +49,33 @@ router.post("/", authMiddleware, CertificationController.addCertification);
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of certifications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   certification_name:
+ *                     type: string
+ *                     example: AWS Certified Developer
+ *                   organisation:
+ *                     type: string
+ *                     example: Amazon
+ *                   cert_url:
+ *                     type: string
+ *                     example: https://aws.amazon.com
+ *                   completion_date:
+ *                     type: string
+ *                     example: 2024-01-01
+ *       401:
+ *         description: Unauthorized
  */
 router.get("/", authMiddleware, CertificationController.getCertifications);
 
@@ -42,6 +94,24 @@ router.get("/", authMiddleware, CertificationController.getCertifications);
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               certification_name:
+ *                 type: string
+ *               organisation:
+ *                 type: string
+ *               cert_url:
+ *                 type: string
+ *               completion_date:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Certification updated
  */
 router.put("/:id", authMiddleware, CertificationController.updateCertification);
 
@@ -54,6 +124,18 @@ router.put("/:id", authMiddleware, CertificationController.updateCertification);
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Certification ID
+ *     responses:
+ *       200:
+ *         description: Certification deleted successfully
+ *       404:
+ *         description: Certification not found
  */
 router.delete("/:id", authMiddleware, CertificationController.deleteCertification);
 

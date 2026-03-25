@@ -67,6 +67,28 @@ router.get("/", authMiddleware, EmploymentController.getJobs);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Employment ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               company:
+ *                 type: string
+ *                 example: Google
+ *               position:
+ *                 type: string
+ *                 example: Senior Software Engineer
+ *               start_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2022-01-01
+ *               end_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2024-01-01
  *     responses:
  *       200:
  *         description: Job updated successfully

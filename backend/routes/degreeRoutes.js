@@ -67,6 +67,27 @@ router.get("/", authMiddleware, DegreeController.getDegrees);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Degree ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               degree_name:
+ *                 type: string
+ *                 example: BSc Software Engineering
+ *               university:
+ *                 type: string
+ *                 example: University of Eastminster
+ *               degree_url:
+ *                 type: string
+ *                 example: https://eastminster.ac.uk/bsc-se
+ *               completion_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2023-03-20
  *     responses:
  *       200:
  *         description: Degree updated successfully

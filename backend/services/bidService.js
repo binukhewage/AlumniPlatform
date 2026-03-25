@@ -38,17 +38,17 @@ class BidService {
     // Insert bid
     const bidId = await BidModel.createBid(profileId, amount);
 
-    // Determine highest bid (tie → earliest wins)
+    // Determine highest bid
     const highestBid = await BidModel.getHighestBid();
 
-    // Reset all bids today to losing
+    // Reset all bids today
     await db.execute(
       `UPDATE bids
        SET status = 'losing'
        WHERE bid_date = CURDATE()`
     );
 
-    // Set highest bid as winning
+    // Set highest as winning
     await db.execute(
       `UPDATE bids
        SET status = 'winning'
@@ -56,11 +56,17 @@ class BidService {
       [highestBid.id]
     );
 
-    const status = highestBid.id === bidId ? "winning" : "losing";
+    // ✅ GET FINAL STATUS FROM DB (IMPORTANT FIX)
+    const [updatedBid] = await db.execute(
+      `SELECT status FROM bids WHERE id = ?`,
+      [bidId]
+    );
 
-    await EmailService.sendBidStatus(email, status);
+    const finalStatus = updatedBid[0].status;
 
-    return { status };
+    await EmailService.sendBidStatus(email, finalStatus);
+
+    return { status: finalStatus };
   }
 
 
@@ -91,9 +97,10 @@ class BidService {
       throw new Error("Bid must be higher than previous");
     }
 
+    // Update bid
     await BidModel.updateBid(bidId, newAmount);
 
-    // Determine new highest bid
+    // Get new highest bid
     const highestBid = await BidModel.getHighestBid();
 
     // Reset all bids today
@@ -111,11 +118,17 @@ class BidService {
       [highestBid.id]
     );
 
-    const status = highestBid.id === bidId ? "winning" : "losing";
+    // ✅ GET FINAL STATUS FROM DB (IMPORTANT FIX)
+    const [updatedBid] = await db.execute(
+      `SELECT status FROM bids WHERE id = ?`,
+      [bidId]
+    );
 
-    await EmailService.sendBidStatus(email, status);
+    const finalStatus = updatedBid[0].status;
 
-    return { status };
+    await EmailService.sendBidStatus(email, finalStatus);
+
+    return { status: finalStatus };
   }
   
   static async getMyBid(userId){

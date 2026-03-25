@@ -72,6 +72,7 @@ router.get(
  *     security:
  *       - bearerAuth: []
  *     requestBody:
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -79,10 +80,13 @@ router.get(
  *             properties:
  *               full_name:
  *                 type: string
+ *                 example: Updated Name
  *               bio:
  *                 type: string
+ *                 example: Updated bio
  *               linkedin_url:
  *                 type: string
+ *                 example: https://linkedin.com/in/updated
  *               profile_image:
  *                 type: string
  *                 format: binary

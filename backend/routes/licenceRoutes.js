@@ -57,7 +57,7 @@ router.get("/", authMiddleware, LicenceController.getLicences);
  * @swagger
  * /licences/{id}:
  *   put:
- *     summary: Update a professional licence
+ *     summary: Update a licence
  *     tags: [Licences]
  *     security:
  *       - bearerAuth: []
@@ -67,6 +67,27 @@ router.get("/", authMiddleware, LicenceController.getLicences);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Licence ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               licence_name:
+ *                 type: string
+ *                 example: Chartered Engineer Pro
+ *               authority:
+ *                 type: string
+ *                 example: Engineering Council
+ *               licence_url:
+ *                 type: string
+ *                 example: https://engc.org.uk
+ *               completion_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2026-03-25
  *     responses:
  *       200:
  *         description: Licence updated successfully

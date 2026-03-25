@@ -18,6 +18,8 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - bid_amount
  *             properties:
  *               bid_amount:
  *                 type: number
@@ -35,7 +37,7 @@ router.post("/", authMiddleware, BidController.placeBid);
  * @swagger
  * /bids/{id}:
  *   put:
- *     summary: Increase an existing bid
+ *     summary: Increase an existing bid (must be higher than previous bid)
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
@@ -45,12 +47,15 @@ router.post("/", authMiddleware, BidController.placeBid);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Bid ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - bid_amount
  *             properties:
  *               bid_amount:
  *                 type: number
@@ -58,6 +63,8 @@ router.post("/", authMiddleware, BidController.placeBid);
  *     responses:
  *       200:
  *         description: Bid updated successfully
+ *       400:
+ *         description: New bid must be higher than previous bid
  */
 router.put("/:id", authMiddleware, BidController.updateBid);
 
@@ -73,6 +80,20 @@ router.put("/:id", authMiddleware, BidController.updateBid);
  *     responses:
  *       200:
  *         description: Returns user's bid information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 bid_amount:
+ *                   type: number
+ *                   example: 400
+ *                 status:
+ *                   type: string
+ *                   example: active
  */
 router.get("/my-bid", authMiddleware, BidController.getMyBid);
 

@@ -11,24 +11,27 @@ const router = express.Router();
  *     tags: [Public API]
  *     responses:
  *       200:
- *         description: Returns the featured alumnus profile
+ *         description: Returns the featured alumnus profile or message if none exists
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 full_name:
- *                   type: string
- *                   example: John Smith
- *                 bio:
- *                   type: string
- *                   example: Software Engineer passionate about cloud technologies
- *                 linkedin_url:
- *                   type: string
- *                   example: https://linkedin.com/in/johnsmith
- *                 profile_image:
- *                   type: string
- *                   example: http://localhost:8080/uploads/profile.jpg
+ *               oneOf:
+ *                 - type: object
+ *                   properties:
+ *                     full_name:
+ *                       type: string
+ *                       example: John Smith
+ *                     bio:
+ *                       type: string
+ *                     linkedin_url:
+ *                       type: string
+ *                     profile_image:
+ *                       type: string
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: No featured alumnus today
  */
 router.get("/featured", async (req, res) => {
 

@@ -10,27 +10,36 @@ import PasswordResetTokenModel from "../models/passwordResetTokenModel.js";
 const SALT_ROUNDS = 10;
 
 class AuthService {
-
   // ------------------- REGISTER (TRANSACTION SAFE) -------------------
-  static async register(email, password) {
+  static async register(full_name, email, password) {
 
     const connection = await db.getConnection();
-
+  
     try {
       await connection.beginTransaction();
-
-      // Basic email format check
+  
+      // Normalize email
+      email = email.trim().toLowerCase();
+  
+      // ---------------- VALIDATION ----------------
+  
+      // Name validation
+      if (!full_name || full_name.trim().length < 2) {
+        throw new Error("Full name is required");
+      }
+  
+      // Email format check
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         throw new Error("Invalid email format");
       }
-
-      // University domain check (case insensitive)
+  
+      // University domain check
       const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN;
-      if (!email.toLowerCase().endsWith(`@${allowedDomain.toLowerCase()}`)) {
+      if (!email.endsWith(`@${allowedDomain.toLowerCase()}`)) {
         throw new Error(`Only ${allowedDomain} email addresses are allowed`);
       }
-
+  
       // Strong password validation
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
       if (!passwordRegex.test(password)) {
@@ -38,45 +47,61 @@ class AuthService {
           "Password must be at least 8 characters long and include at least one uppercase letter and one number"
         );
       }
-
-      // Check if user already exists
+  
+      // ---------------- CHECK USER ----------------
+  
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
         throw new Error("Email already registered");
       }
-
-      // Hash password
+  
+      // ---------------- CREATE USER ----------------
+  
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-      // Create user using transaction connection
+  
       const [userResult] = await connection.execute(
         "INSERT INTO users (email, password) VALUES (?, ?)",
         [email, hashedPassword]
       );
-
+  
       const userId = userResult.insertId;
-
-      // Generate secure token
+  
+      // ---------------- CREATE PROFILE ----------------
+  
+      await connection.execute(
+        `INSERT INTO profiles (user_id, full_name)
+         VALUES (?, ?)`,
+        [userId, full_name]
+      );
+  
+      // ---------------- TOKEN ----------------
+  
       const token = crypto.randomBytes(32).toString("hex");
-
-      // Expiry 24 hours
+  
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      // Store token
+  
       await connection.execute(
         "INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
         [userId, token, expiresAt]
       );
-
-      // Send verification email BEFORE commit
-      await EmailService.sendVerificationEmail(email, token);
-
-      // If everything succeeded → commit
+  
+      // ---------------- COMMIT ----------------
+  
       await connection.commit();
       connection.release();
-
+  
+      // ---------------- EMAIL ----------------
+  
+      await EmailService.sendVerificationEmail(email, token);
+  
+      // ---------------- RESPONSE ----------------
+  
+      if (process.env.TEST_MODE === "true") {
+        return { userId, verificationToken: token };
+      }
+  
       return { userId };
-
+  
     } catch (error) {
       await connection.rollback();
       connection.release();
@@ -100,10 +125,9 @@ class AuthService {
       throw new Error("Token expired");
     }
 
-    await db.execute(
-      "UPDATE users SET is_verified = TRUE WHERE id = ?",
-      [record.user_id]
-    );
+    await db.execute("UPDATE users SET is_verified = TRUE WHERE id = ?", [
+      record.user_id,
+    ]);
 
     await VerificationTokenModel.deleteById(record.id);
 
@@ -130,7 +154,7 @@ class AuthService {
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     return { token };
@@ -142,49 +166,54 @@ class AuthService {
   }
 
   // ------------------- FORGOT PASSWORD -------------------
-static async forgotPassword(email) {
+  static async forgotPassword(email) {
+    const user = await UserModel.findByEmail(email);
 
-  const user = await UserModel.findByEmail(email);
+    if (!user) {
+      throw new Error("No account with that email");
+    }
 
-  if (!user) {
-    throw new Error("No account with that email");
-  }
+    const token = crypto.randomBytes(32).toString("hex");
 
-  const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await PasswordResetTokenModel.createToken(user.id, token, expiresAt);
 
-  await PasswordResetTokenModel.createToken(user.id, token, expiresAt);
+    await EmailService.sendPasswordResetEmail(email, token);
 
-  await EmailService.sendPasswordResetEmail(email, token);
-
-  return { message: "Password reset email sent" };
+if (process.env.TEST_MODE === "true") {
+  return {
+    message: "Password reset email sent",
+    resetToken: token
+  };
 }
 
-// ------------------- RESET PASSWORD -------------------
-static async resetPassword(token, newPassword) {
-
-  const record = await PasswordResetTokenModel.findByToken(token);
-
-  if (!record) {
-    throw new Error("Invalid or expired token");
+return { message: "Password reset email sent" };
   }
 
-  if (new Date(record.expires_at) < new Date()) {
-    throw new Error("Token expired");
+  // ------------------- RESET PASSWORD -------------------
+  static async resetPassword(token, newPassword) {
+    const record = await PasswordResetTokenModel.findByToken(token);
+
+    if (!record) {
+      throw new Error("Invalid or expired token");
+    }
+
+    if (new Date(record.expires_at) < new Date()) {
+      throw new Error("Token expired");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    await db.execute("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      record.user_id,
+    ]);
+
+    await PasswordResetTokenModel.deleteById(record.id);
+
+    return { message: "Password reset successful" };
   }
-
-  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-  await db.execute(
-    "UPDATE users SET password = ? WHERE id = ?",
-    [hashedPassword, record.user_id]
-  );
-
-  await PasswordResetTokenModel.deleteById(record.id);
-
-  return { message: "Password reset successful" };
-}
 }
 
 export default AuthService;

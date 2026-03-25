@@ -1,5 +1,6 @@
 import express from "express";
 import AuthController from "../controllers/authController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -76,11 +77,13 @@ router.post("/login", AuthController.login);
  *   post:
  *     summary: Logout user
  *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout successful
  */
-router.post("/logout", AuthController.logout);
+router.post("/logout", authMiddleware, AuthController.logout);
 
 
 /**
@@ -109,7 +112,7 @@ router.post("/forgot-password", AuthController.forgotPassword);
  * @swagger
  * /auth/reset-password:
  *   post:
- *     summary: Reset password using token
+ *     summary: Reset password
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -117,11 +120,16 @@ router.post("/forgot-password", AuthController.forgotPassword);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
  *             properties:
  *               token:
  *                 type: string
- *               password:
+ *                 example: abc123xyz
+ *               newPassword:
  *                 type: string
+ *                 example: Newpass123
  *     responses:
  *       200:
  *         description: Password reset successful
