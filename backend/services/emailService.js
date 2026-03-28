@@ -61,7 +61,7 @@ class EmailService {
       html: `
         <h2>Bid Status Update</h2>
         <p>Your current bid status is:</p>
-        <h3>${status.toUpperCase()}</h3>
+        <h3>${(status || "").toUpperCase()}</h3>
         <p>You can increase your bid if you want to improve your chances of becoming Alumni of the Day.</p>
       `
     });

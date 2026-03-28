@@ -12,6 +12,7 @@ const router = express.Router();
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -41,6 +42,7 @@ router.post("/", authMiddleware, BidController.placeBid);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -77,9 +79,10 @@ router.put("/:id", authMiddleware, BidController.updateBid);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     responses:
  *       200:
- *         description: Returns user's bid information
+ *         description: Returns user's current bid
  *         content:
  *           application/json:
  *             schema:
@@ -93,8 +96,62 @@ router.put("/:id", authMiddleware, BidController.updateBid);
  *                   example: 400
  *                 status:
  *                   type: string
- *                   example: active
+ *                   example: winning
  */
 router.get("/my-bid", authMiddleware, BidController.getMyBid);
+
+
+/**
+ * @swagger
+ * /bids/history:
+ *   get:
+ *     summary: Get user's bidding history (one record per day)
+ *     description: Returns all past bids placed by the user. Each day contains only one bid record since updates overwrite the same day's bid.
+ *     tags: [Bidding]
+ *     security:
+ *       - bearerAuth: []
+ *       - ApiKeyAuth: []
+ *     responses:
+ *       200:
+ *         description: List of past bids
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   bid_amount:
+ *                     type: number
+ *                     example: 300
+ *                   status:
+ *                     type: string
+ *                     example: losing
+ *                   bid_date:
+ *                     type: string
+ *                     example: 2026-03-28
+ */
+router.get("/history", authMiddleware, BidController.getBidHistory);
+
+/**
+ * @swagger
+ * /bids/{id}:
+ *   delete:
+ *     summary: Cancel (delete) today's bid
+ *     tags: [Bidding]
+ *     security:
+ *       - bearerAuth: []
+ *       - ApiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Bid cancelled successfully
+ */
+router.delete("/:id", authMiddleware, BidController.cancelBid);
 
 export default router;

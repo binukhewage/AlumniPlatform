@@ -16,6 +16,9 @@ import courseRoutes from "./routes/courseRoutes.js";
 import employmentRoutes from "./routes/employmentRoutes.js";
 import bidRoutes from "./routes/bidRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import apiKeyRoutes from "./routes/apiKeyRoutes.js";
+import apiKeyMiddleware from "./middleware/apiKeyMiddleware.js";
+
 import "./jobs/bidScheduler.js";
 import { swaggerUi, swaggerSpec } from "./config/swagger.js";
 import rateLimit from "express-rate-limit";
@@ -73,14 +76,15 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   });
 });
 
-app.use("/api/profile", profileRoutes);
-app.use("/api/degrees", degreeRoutes);
-app.use("/api/certifications", certificationRoutes);
-app.use("/api/licences", licenceRoutes);
-app.use("/api/courses", courseRoutes);
+app.use("/api/profile",  profileRoutes);
+app.use("/api/degrees",  degreeRoutes);
+app.use("/api/certifications",  certificationRoutes);
+app.use("/api/licences",  licenceRoutes);
+app.use("/api/courses",  courseRoutes);
 app.use("/api/employment", employmentRoutes);
 app.use("/api/bids", limiter, bidRoutes);
-app.use("/api/public", publicRoutes);
+app.use("/api/public", apiKeyMiddleware, publicRoutes);
+app.use("/api/api-keys", authMiddleware, apiKeyRoutes);
 
 const PORT = process.env.PORT || 8080;
 

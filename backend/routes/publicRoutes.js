@@ -9,6 +9,8 @@ const router = express.Router();
  *   get:
  *     summary: Get today's featured alumnus (Alumni of the Day)
  *     tags: [Public API]
+ *     security:
+ *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Returns the featured alumnus profile or message if none exists

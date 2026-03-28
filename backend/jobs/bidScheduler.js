@@ -2,19 +2,13 @@ import cron from "node-cron";
 import db from "../config/db.js";
 import EmailService from "../services/emailService.js";
 
-/*
-Testing mode → runs every 5 minutes
-Before submission change to:
-cron.schedule("0 18 * * *", ...)
-*/
-
-cron.schedule("*/5 * * * *", async () => {
+cron.schedule("0 18 * * *", async () => {
 
   console.log("Running Alumni Winner Selection...");
 
   try {
 
-    // Prevent duplicate winner insertion
+    //  Prevent duplicate winner insertion
     const [existing] = await db.execute(
       `SELECT * FROM featured_alumni
        WHERE feature_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)`
@@ -25,23 +19,34 @@ cron.schedule("*/5 * * * *", async () => {
       return;
     }
 
-    // Get highest bid today
-    const [rows] = await db.execute(
+    // Get all valid bids (exclude cancelled)
+    const [bids] = await db.execute(
       `SELECT *
        FROM bids
        WHERE bid_date = CURDATE()
-       ORDER BY bid_amount DESC
-       LIMIT 1`
+       AND status != 'cancelled'
+       ORDER BY bid_amount DESC, created_at ASC`
     );
 
-    if (rows.length === 0) {
+    if (bids.length === 0) {
       console.log("No bids today");
       return;
     }
 
-    const winner = rows[0];
+    const winner = bids[0];
 
-    // Save winner for tomorrow's feature
+    //  STEP 1 — FINALIZE STATUSES
+    for (const bid of bids) {
+
+      const finalStatus = bid.id === winner.id ? "won" : "lost";
+
+      await db.execute(
+        `UPDATE bids SET status = ? WHERE id = ?`,
+        [finalStatus, bid.id]
+      );
+    }
+
+    //  STEP 2 — SAVE FEATURED ALUMNI (for tomorrow)
     await db.execute(
       `INSERT INTO featured_alumni
        (profile_id, bid_id, feature_date)
@@ -49,7 +54,7 @@ cron.schedule("*/5 * * * *", async () => {
       [winner.profile_id, winner.id]
     );
 
-    // Get winner email
+    //  STEP 3 — SEND EMAIL TO WINNER
     const [profile] = await db.execute(
       `SELECT u.email
        FROM profiles p
@@ -58,7 +63,6 @@ cron.schedule("*/5 * * * *", async () => {
       [winner.profile_id]
     );
 
-    // Send email
     if (profile.length > 0) {
       await EmailService.sendWinnerNotification(profile[0].email);
     }

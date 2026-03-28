@@ -12,6 +12,7 @@ const router = express.Router();
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -49,33 +50,10 @@ router.post("/", authMiddleware, CertificationController.addCertification);
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: List of certifications
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   certification_name:
- *                     type: string
- *                     example: AWS Certified Developer
- *                   organisation:
- *                     type: string
- *                     example: Amazon
- *                   cert_url:
- *                     type: string
- *                     example: https://aws.amazon.com
- *                   completion_date:
- *                     type: string
- *                     example: 2024-01-01
- *       401:
- *         description: Unauthorized
  */
 router.get("/", authMiddleware, CertificationController.getCertifications);
 
@@ -88,6 +66,7 @@ router.get("/", authMiddleware, CertificationController.getCertifications);
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -109,6 +88,7 @@ router.get("/", authMiddleware, CertificationController.getCertifications);
  *                 type: string
  *               completion_date:
  *                 type: string
+ *                 format: date
  *     responses:
  *       200:
  *         description: Certification updated
@@ -124,18 +104,16 @@ router.put("/:id", authMiddleware, CertificationController.updateCertification);
  *     tags: [Certifications]
  *     security:
  *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: Certification ID
  *     responses:
  *       200:
  *         description: Certification deleted successfully
- *       404:
- *         description: Certification not found
  */
 router.delete("/:id", authMiddleware, CertificationController.deleteCertification);
 

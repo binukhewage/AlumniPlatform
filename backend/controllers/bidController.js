@@ -47,7 +47,7 @@ class BidController {
   }
 
 
-  // ⭐ NEW METHOD (for frontend)
+  //  NEW METHOD (for frontend)
 
   static async getMyBid(req,res){
 
@@ -65,6 +65,34 @@ class BidController {
 
     }
 
+  }
+
+  static async getBidHistory(req, res) {
+    try {
+      const userId = req.user.userId;
+  
+      const bids = await BidService.getBidHistory(userId);
+  
+      res.json(bids);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async cancelBid(req, res) {
+    try {
+      const userId = req.user.id || req.user.userId;
+  
+      const result = await BidService.cancelBid(
+        userId,
+        req.params.id
+      );
+  
+      res.json(result);
+  
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
 
 }

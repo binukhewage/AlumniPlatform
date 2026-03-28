@@ -16,11 +16,20 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - full_name
+ *               - email
+ *               - password
  *             properties:
+ *               full_name:
+ *                 type: string
+ *                 example: John Smith
  *               email:
  *                 type: string
+ *                 example: john@example.com
  *               password:
  *                 type: string
+ *                 example: Password123
  *     responses:
  *       201:
  *         description: Registration successful
