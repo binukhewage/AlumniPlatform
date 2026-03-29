@@ -10,16 +10,21 @@ const BidSection = () => {
   const loadBid = async () => {
     try {
       const res = await api.get("/bids/my-bid");
-      setBid(res.data);
-      setStatus(res.data.status);
+  
+      // FIX: detect no active bid properly
+      if (res.data.message) {
+        setBid(null);
+        setStatus("");
+      } else {
+        setBid(res.data);
+        setStatus(res.data.status);
+      }
+  
     } catch {
       setBid(null);
+      setStatus("");
     }
   };
-
-  useEffect(() => {
-    loadBid();
-  }, []);
 
   const placeBid = async (e) => {
     e.preventDefault();
@@ -46,6 +51,23 @@ const BidSection = () => {
       loadBid();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to increase bid");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // NEW: cancel bid
+  const cancelBid = async () => {
+    if (!bid) return;
+
+    setLoading(true);
+    try {
+      await api.delete(`/bids/${bid.id}`);
+      setBid(null);
+      setStatus("");
+      loadBid();
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to cancel bid");
     } finally {
       setLoading(false);
     }
@@ -120,6 +142,18 @@ const BidSection = () => {
             >
               {loading ? "Processing..." : bid ? "Update My Bid" : "Join the Auction"}
             </button>
+
+            {/* NEW: cancel button */}
+            {bid && (
+              <button
+                type="button"
+                onClick={cancelBid}
+                disabled={loading}
+                className="w-full py-2 rounded-xl font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-all"
+              >
+                Cancel My Bid
+              </button>
+            )}
           </form>
           
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
