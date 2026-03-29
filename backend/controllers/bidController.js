@@ -2,6 +2,7 @@ import BidService from "../services/bidService.js";
 
 class BidController {
 
+// PLace BID 
   static async placeBid(req,res){
 
     try{
@@ -21,6 +22,8 @@ class BidController {
     }
 
   }
+
+  // UPDATE BID (ONLY NICREASING IS ALLWED)
 
   static async updateBid(req,res){
 
@@ -47,7 +50,7 @@ class BidController {
   }
 
 
-  //  NEW METHOD (for frontend)
+  //  GET BID details of the logged in user 
 
   static async getMyBid(req,res){
 
@@ -67,6 +70,8 @@ class BidController {
 
   }
 
+  //Get bid history 
+
   static async getBidHistory(req, res) {
     try {
       const userId = req.user.userId;
@@ -79,6 +84,7 @@ class BidController {
     }
   }
 
+  // Cancel BID 
   static async cancelBid(req, res) {
     try {
       const userId = req.user.id || req.user.userId;

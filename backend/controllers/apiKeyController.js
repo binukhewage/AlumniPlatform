@@ -2,7 +2,7 @@ import ApiKeyService from "../services/apiKeyService.js";
 
 class ApiKeyController {
 
-  // CREATE KEY
+  // CREATE KEY (GEnerate new key for developer / user)
   static async createKey(req, res) {
     try {
       const { name } = req.body;
@@ -15,7 +15,7 @@ class ApiKeyController {
     }
   }
 
-  // LIST KEYS (CLEAN)
+  // LIST KEYS (Name and created at)
   static async getKeys(req, res) {
     try {
       const keys = await ApiKeyService.getKeys();
@@ -40,7 +40,7 @@ class ApiKeyController {
     }
   }
 
-  // NEW — GET KEY STATS
+  // GET KEY STATS
   static async getKeyStats(req, res) {
     try {
       const { id } = req.params;
@@ -53,6 +53,7 @@ class ApiKeyController {
         });
       }
 
+      // structred response
       res.json({
         id: key.id,
         name: key.name,

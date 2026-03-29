@@ -1,8 +1,12 @@
+// This middleware is responsible for protecting API endpoints using API key authentication
+
 import ApiKeyModel from "../models/apiKeyModel.js";
+
+//Middle ware Funtion to validate API Keys
 
 const apiKeyMiddleware = async (req, res, next) => {
 
-  //  EXCLUDE THESE ROUTES
+  //  EXCLUDE THESE ROUTES (These does not require API including profile/degrees and all others 
   if (
     req.path.startsWith("/auth") ||
     req.path.startsWith("/api-keys")
@@ -10,6 +14,7 @@ const apiKeyMiddleware = async (req, res, next) => {
     return next();
   }
 
+  //Extract API Key from Header 
   const key = req.headers["x-api-key"];
 
   if (!key) {
@@ -18,7 +23,8 @@ const apiKeyMiddleware = async (req, res, next) => {
     });
   }
 
-  //  ADD THIS (FRONTEND KEY BYPASS)
+  //  ADD THIS (FRONTEND KEY BYPASS FOR FEATURED ALUMNI SHOW )
+  //allows Frontend to  access API without DB check 
   if (key === process.env.FRONTEND_API_KEY) {
     return next();
   }
@@ -28,11 +34,11 @@ const apiKeyMiddleware = async (req, res, next) => {
 
   if (!record) {
     return res.status(403).json({
-      error: "Invalid or revoked API key"
+      error: "Invalid or revoked API key"  //if key invalid or revoked throw the error 
     });
   }
 
-  //  increment usage
+  //  increment usage (Track Usage)
   await ApiKeyModel.incrementUsage(record.id);
 
   next();

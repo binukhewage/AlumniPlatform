@@ -1,14 +1,23 @@
+{/* This scheduler runs every day at 6 PM, 
+  selects the highest bidder, 
+  finalizes all bid statuses, 
+  stores the winner for the next day, 
+  and sends a notification email. */} 
+
+
+// Import corn sceduler library (library that automatically runs task at a specific time)
 import cron from "node-cron";
 import db from "../config/db.js";
-import EmailService from "../services/emailService.js";
+import EmailService from "../services/emailService.js";  // email service 
 
+//scedule to run at 6PM every day 
 cron.schedule("0 18 * * *", async () => {
 
   console.log("Running Alumni Winner Selection...");
 
   try {
 
-    //  Prevent duplicate winner insertion
+    //  Prevent duplicate winner insertion (CHECKS WHETHER WINNER IS ALREADY SELECTED)
     const [existing] = await db.execute(
       `SELECT * FROM featured_alumni
        WHERE feature_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)`
@@ -28,6 +37,7 @@ cron.schedule("0 18 * * *", async () => {
        ORDER BY bid_amount DESC, created_at ASC`
     );
 
+    //stops if theres no bids 
     if (bids.length === 0) {
       console.log("No bids today");
       return;
