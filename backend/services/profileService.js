@@ -26,12 +26,17 @@ class ProfileService {
     return { profileId };
   }
 
+
+
   static async getProfile(userId) {
 
     const profile = await ProfileModel.getProfileByUser(userId);
 
     return profile;
   }
+
+
+
 
   static async updateProfile(userId, data) {
 
@@ -40,6 +45,9 @@ class ProfileService {
     return { message: "Profile updated" };
   }
 
+
+
+  
   static async deleteProfile(userId) {
 
     await ProfileModel.deleteProfile(userId);

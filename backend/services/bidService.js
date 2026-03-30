@@ -4,6 +4,8 @@ import EmailService from "./emailService.js";
 
 class BidService {
 
+  // Determine which auction date the bid belongs to
+  // If after 6 PM → assign to next day
   static getAuctionDate() {
     const now = new Date();
     const hour = now.getHours();
@@ -14,6 +16,7 @@ class BidService {
       bidDateObj.setDate(bidDateObj.getDate() + 1);
     }
 
+    // Format as YYYY-MM-DD
     const year = bidDateObj.getFullYear();
     const month = String(bidDateObj.getMonth() + 1).padStart(2, "0");
     const day = String(bidDateObj.getDate()).padStart(2, "0");
@@ -26,6 +29,7 @@ class BidService {
 
     const bidDate = this.getAuctionDate();
 
+    // Get profile + email (needed for bidding + notifications)
     const [profile] = await db.execute(
       `SELECT p.id, u.email
        FROM profiles p
@@ -39,21 +43,27 @@ class BidService {
     const profileId = profile[0].id;
     const email = profile[0].email;
 
+    // Limit: max 3 wins per month
     const monthlyWins = await BidModel.getMonthlyWins(profileId);
     if (monthlyWins >= 3) throw new Error("Monthly feature limit reached");
 
+    // Only ONE active bid per user per day
     const existingBid = await BidModel.getBidByProfile(profileId, bidDate);
     if (existingBid) {
       throw new Error("You already have an active bid. Update or cancel it.");
     }
 
+    // if no active bid Insert new bid
     const bidId = await BidModel.createBid(profileId, amount, bidDate);
 
-    //  CORRECT STATUS LOGIC
+    // ---------------- STATUS LOGIC ----------------
+    
+    // Get all active bids (sorted highest → lowest)
     const allBids = await BidModel.getAllActiveBids(bidDate);
 
     if (allBids.length === 1) {
 
+      // if there's no other bids set to winning
       await db.execute(
         `UPDATE bids SET status = 'winning' WHERE id = ?`,
         [allBids[0].id]
@@ -61,6 +71,7 @@ class BidService {
 
     } else {
 
+      // Multiple bids → determine highest
       const highest = allBids[0];
 
       await db.execute(
@@ -77,15 +88,18 @@ class BidService {
       );
     }
 
+    // Highest as winning
     const [updatedBid] = await db.execute(
       `SELECT status FROM bids WHERE id = ?`,
       [bidId]
     );
 
+    // Get final status of this bid
     const finalStatus = updatedBid[0]?.status;
 
     if (!finalStatus) throw new Error("Failed to determine bid status");
 
+    // Send email notification
     await EmailService.sendBidStatus(email, finalStatus);
 
     return { status: finalStatus };
@@ -107,12 +121,15 @@ class BidService {
 
     if (!currentBid) throw new Error("No existing bid found");
 
+    // New bid must be higher
     if (newAmount <= currentBid.bid_amount) {
       throw new Error("Bid must be higher than previous");
     }
 
+    // Update bid amount
     await BidModel.updateBid(bidId, newAmount);
 
+    // Recalculate statuses
     const allBids = await BidModel.getAllActiveBids(bidDate);
 
     if (allBids.length === 1) {
@@ -207,11 +224,13 @@ class BidService {
       throw new Error("Bid not found");
     }
 
+    // Mark bid as cancelled
     await db.execute(
       `UPDATE bids SET status = 'cancelled' WHERE id = ?`,
       [bidId]
     );
 
+    // Recalculate remaining bids
     const allBids = await BidModel.getAllActiveBids(bidDate);
 
     if (allBids.length === 1) {

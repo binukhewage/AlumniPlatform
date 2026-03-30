@@ -23,6 +23,8 @@ class CourseService {
 
   }
 
+
+  
   static async getCourses(userId){
 
     const [profile] = await db.execute(
@@ -40,6 +42,8 @@ class CourseService {
 
   }
 
+
+
   static async updateCourse(id, data){
 
     await CourseModel.updateCourse(id, data);
@@ -47,6 +51,8 @@ class CourseService {
     return { message: "Course updated" };
 
   }
+
+
 
   static async deleteCourse(id){
 

@@ -5,6 +5,8 @@ class ApiKeyService {
 
   //  GENERATE KEY
   static async generateKey(name) {
+
+    // Generate a secure random key (32 bytes → hex string)
     const key = crypto.randomBytes(32).toString("hex");
 
     await ApiKeyModel.create(name, key);
@@ -26,7 +28,7 @@ class ApiKeyService {
     };
   }
 
-  // 🔥 NEW — GET KEY STATS
+  // NEW — GET KEY STATS
   static async getKeyStats(id) {
     const key = await ApiKeyModel.getKeyStats(id);
 

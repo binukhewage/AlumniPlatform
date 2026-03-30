@@ -23,6 +23,9 @@ class LicenceService {
 
   }
 
+
+  
+
   static async getLicences(userId){
 
     const [profile] = await db.execute(
@@ -40,6 +43,9 @@ class LicenceService {
 
   }
 
+
+
+
   static async updateLicence(id, data){
 
     await LicenceModel.updateLicence(id, data);
@@ -47,6 +53,9 @@ class LicenceService {
     return { message: "Licence updated" };
 
   }
+
+
+
 
   static async deleteLicence(id){
 

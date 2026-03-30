@@ -19,20 +19,8 @@ class BidModel {
     );
   }
 
-  static async getBidByProfile(profileId, bidDate) {
-    const [rows] = await db.execute(
-      `SELECT *
-       FROM bids
-       WHERE profile_id = ?
-       AND bid_date = ?
-       AND status != 'cancelled'
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      [profileId, bidDate]
-    );
-
-    return rows[0];
-  }
+  // Get the highest bid for a specific date
+  // If tie → earliest created_at wins 
   static async getHighestBid(bidDate) {
     const [rows] = await db.execute(
       `SELECT *
@@ -75,6 +63,8 @@ class BidModel {
     return rows;
   }
 
+  // Count how many times a user has won in current month
+  // Used to enforce monthly limit (max 3 wins)
   static async getMonthlyWins(profileId) {
     const [rows] = await db.execute(
       `SELECT COUNT(*) AS wins
