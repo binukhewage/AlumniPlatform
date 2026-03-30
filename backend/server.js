@@ -18,6 +18,7 @@ import bidRoutes from "./routes/bidRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import apiKeyRoutes from "./routes/apiKeyRoutes.js";
 import apiKeyMiddleware from "./middleware/apiKeyMiddleware.js";
+import allowRoles from "./middleware/roleMiddleware.js";
 
 import "./jobs/bidScheduler.js";
 import { swaggerUi, swaggerSpec } from "./config/swagger.js";
@@ -84,7 +85,14 @@ app.use("/api/courses",  courseRoutes);
 app.use("/api/employment", employmentRoutes);
 app.use("/api/bids", limiter, bidRoutes);
 app.use("/api/public", apiKeyMiddleware, publicRoutes);
-app.use("/api/api-keys", authMiddleware, apiKeyRoutes);
+
+// Developer Only
+app.use(
+  "/api/api-keys",
+  authMiddleware,
+  allowRoles("developer"), 
+  apiKeyRoutes
+);
 
 const PORT = process.env.PORT || 8080;
 
