@@ -19,6 +19,7 @@ import publicRoutes from "./routes/publicRoutes.js";
 import apiKeyRoutes from "./routes/apiKeyRoutes.js";
 import apiKeyMiddleware from "./middleware/apiKeyMiddleware.js";
 import allowRoles from "./middleware/roleMiddleware.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
 import "./jobs/bidScheduler.js";
 import { swaggerUi, swaggerSpec } from "./config/swagger.js";
@@ -92,6 +93,13 @@ app.use(
   authMiddleware,
   allowRoles("developer"), 
   apiKeyRoutes
+);
+
+app.use(
+  "/api/analytics",
+  authMiddleware,
+  allowRoles("developer"),
+  analyticsRoutes
 );
 
 const PORT = process.env.PORT || 8080;
