@@ -17,6 +17,10 @@ const Profile = () => {
     window.location.href = "/featured";
   };
 
+  const viewAlumni = () => {
+    window.location.href = "/view-alumni";
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Refined Navigation Bar */}
@@ -32,6 +36,12 @@ const Profile = () => {
               className="text-sm font-medium bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded-lg transition-colors cursor-pointer"
             >
               Featured Alumni
+            </button>
+            <button
+              onClick={viewAlumni}
+              className="text-sm font-medium bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded-lg transition-colors cursor-pointer"
+            >
+              View Alumni 
             </button>
 
             <button

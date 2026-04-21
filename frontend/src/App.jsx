@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import FeaturedAlumni from "./pages/FeaturedAlumni";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import ViewAlumni from "./pages/ViewAlumni";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/featured" element={<FeaturedAlumni />} />
         <Route path="/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/view-alumni" element={<ViewAlumni />} />
         {/* Protected Profile Page */}
         <Route
           path="/profile"

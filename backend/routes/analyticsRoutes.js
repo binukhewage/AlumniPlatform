@@ -1,3 +1,5 @@
+// routes/analyticsRoutes.js
+
 import express from "express";
 import AnalyticsController from "../controllers/analyticsController.js";
 
@@ -14,13 +16,11 @@ const router = express.Router();
  * @swagger
  * /analytics/summary:
  *   get:
- *     summary: Get dashboard summary statistics
+ *     summary: Get dashboard summary cards
  *     tags: [Analytics]
  *     responses:
  *       200:
  *         description: Summary data returned successfully
- *       403:
- *         description: Access denied
  *       500:
  *         description: Server error
  */
@@ -28,15 +28,27 @@ router.get("/summary", AnalyticsController.getSummary);
 
 /**
  * @swagger
+ * /analytics/skills-gap:
+ *   get:
+ *     summary: Get curriculum skill gap radar chart data
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Skills gap data returned successfully
+ *       500:
+ *         description: Server error
+ */
+router.get("/skills-gap", AnalyticsController.getSkillsGap);
+
+/**
+ * @swagger
  * /analytics/employment-sectors:
  *   get:
- *     summary: Get employment sector statistics
+ *     summary: Get employment by industry sector chart data
  *     tags: [Analytics]
  *     responses:
  *       200:
  *         description: Employment sector data returned successfully
- *       403:
- *         description: Access denied
  *       500:
  *         description: Server error
  */
@@ -47,28 +59,23 @@ router.get(
 
 /**
  * @swagger
- * /analytics/certifications:
+ * /analytics/job-titles:
  *   get:
- *     summary: Get certification statistics
+ *     summary: Get most common alumni job titles
  *     tags: [Analytics]
  *     responses:
  *       200:
- *         description: Certification data returned successfully
- *       403:
- *         description: Access denied
+ *         description: Job titles returned successfully
  *       500:
  *         description: Server error
  */
-router.get(
-  "/certifications",
-  AnalyticsController.getCertifications
-);
+router.get("/job-titles", AnalyticsController.getJobTitles);
 
 /**
  * @swagger
  * /analytics/top-employers:
  *   get:
- *     summary: Get top employers
+ *     summary: Get top employers hiring alumni
  *     tags: [Analytics]
  *     responses:
  *       200:
@@ -76,128 +83,68 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-    "/top-employers",
-    AnalyticsController.getTopEmployers
-  );
-  
-  /**
-   * @swagger
-   * /analytics/job-titles:
-   *   get:
-   *     summary: Get most common job titles
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Job titles returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/job-titles",
-    AnalyticsController.getJobTitles
-  );
-  
-  /**
-   * @swagger
-   * /analytics/growth:
-   *   get:
-   *     summary: Get alumni growth over time
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Growth data returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/growth",
-    AnalyticsController.getGrowthOverTime
-  );
-  
-  /**
-   * @swagger
-   * /analytics/degrees:
-   *   get:
-   *     summary: Get degree distribution
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Degree distribution returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/degrees",
-    AnalyticsController.getDegreeDistribution
-  );
+router.get("/top-employers", AnalyticsController.getTopEmployers);
 
-  /**
+/**
  * @swagger
- * /analytics/skills-gap:
+ * /analytics/geographic-distribution:
  *   get:
- *     summary: Get skills gap radar data
+ *     summary: Get geographic distribution of alumni
  *     tags: [Analytics]
  *     responses:
  *       200:
- *         description: Skills gap data returned successfully
+ *         description: Geographic data returned successfully
  *       500:
  *         description: Server error
  */
 router.get(
-    "/skills-gap",
-    AnalyticsController.getSkillsGap
-  );
-  
-  /**
-   * @swagger
-   * /analytics/graduation-years:
-   *   get:
-   *     summary: Get alumni by graduation year
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Graduation year data returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/graduation-years",
-    AnalyticsController.getGraduationYears
-  );
-  
-  /**
-   * @swagger
-   * /analytics/sector-demand:
-   *   get:
-   *     summary: Get sector demand statistics
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Sector demand data returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/sector-demand",
-    AnalyticsController.getSectorDemand
-  );
-  
-  /**
-   * @swagger
-   * /analytics/courses-popularity:
-   *   get:
-   *     summary: Get popular courses data
-   *     tags: [Analytics]
-   *     responses:
-   *       200:
-   *         description: Course popularity data returned successfully
-   *       500:
-   *         description: Server error
-   */
-  router.get(
-    "/courses-popularity",
-    AnalyticsController.getCoursesPopularity
-  );
+  "/geographic-distribution",
+  AnalyticsController.getGeographicDistribution
+);
+
+/**
+ * @swagger
+ * /analytics/sector-demand:
+ *   get:
+ *     summary: Get industry demand by sector
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Sector demand data returned successfully
+ *       500:
+ *         description: Server error
+ */
+router.get("/sector-demand", AnalyticsController.getSectorDemand);
+
+/**
+ * @swagger
+ * /analytics/certifications:
+ *   get:
+ *     summary: Get certification growth trend data
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Certification data returned successfully
+ *       500:
+ *         description: Server error
+ */
+router.get("/certifications", AnalyticsController.getCertifications);
+
+/**
+ * @swagger
+ * /analytics/courses-popularity:
+ *   get:
+ *     summary: Get professional development courses popularity
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Course popularity data returned successfully
+ *       500:
+ *         description: Server error
+ */
+router.get(
+  "/courses-popularity",
+  AnalyticsController.getCoursesPopularity
+);
 
 export default router;

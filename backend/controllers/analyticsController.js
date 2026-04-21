@@ -10,27 +10,18 @@ class AnalyticsController {
     }
   }
 
+  static async getSkillsGap(req, res) {
+    try {
+      const data = await AnalyticsService.getSkillsGap();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async getEmploymentSectors(req, res) {
     try {
       const data = await AnalyticsService.getEmploymentSectors();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  static async getCertifications(req, res) {
-    try {
-      const data = await AnalyticsService.getCertifications();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  static async getTopEmployers(req, res) {
-    try {
-      const data = await AnalyticsService.getTopEmployers();
       res.json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -46,41 +37,24 @@ class AnalyticsController {
     }
   }
 
-  static async getGrowthOverTime(req, res) {
+  static async getTopEmployers(req, res) {
     try {
-      const data = await AnalyticsService.getGrowthOverTime();
+      const data = await AnalyticsService.getTopEmployers();
       res.json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  static async getDegreeDistribution(req, res) {
+  static async getGeographicDistribution(req, res) {
     try {
-      const data = await AnalyticsService.getDegreeDistribution();
+      const data = await AnalyticsService.getGeographicDistribution();
       res.json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  static async getSkillsGap(req, res) {
-    try {
-      const data = await AnalyticsService.getSkillsGap();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-  
-  static async getGraduationYears(req, res) {
-    try {
-      const data = await AnalyticsService.getGraduationYears();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-  
+
   static async getSectorDemand(req, res) {
     try {
       const data = await AnalyticsService.getSectorDemand();
@@ -89,7 +63,16 @@ class AnalyticsController {
       res.status(500).json({ error: error.message });
     }
   }
-  
+
+  static async getCertifications(req, res) {
+    try {
+      const data = await AnalyticsService.getCertifications();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async getCoursesPopularity(req, res) {
     try {
       const data = await AnalyticsService.getCoursesPopularity();

@@ -130,12 +130,14 @@ CREATE TABLE employment_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   profile_id INT NOT NULL,
   company VARCHAR(255) NOT NULL,
+  industry VARCHAR(255),
   position VARCHAR(255) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE,
 
   FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE,
-  INDEX (profile_id)
+  INDEX (profile_id),
+  INDEX (industry)
 );
 
 -- ========================
@@ -144,7 +146,7 @@ CREATE TABLE employment_history (
 CREATE TABLE api_keys (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  key_value VARCHAR(255) NOT NULL UNIQUE, 
+  key_value VARCHAR(255) NOT NULL UNIQUE,
   is_active TINYINT(1) DEFAULT 1,
   usage_count INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

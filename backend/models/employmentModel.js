@@ -4,17 +4,31 @@ class EmploymentModel {
 
   static async createJob(profileId, job){
 
-    const { company, position, start_date, end_date } = job;
+    const {
+      company,
+      industry,
+      location,
+      position,
+      start_date,
+      end_date
+    } = job;
 
     const [result] = await db.execute(
       `INSERT INTO employment_history
-      (profile_id, company, position, start_date, end_date)
-      VALUES (?,?,?,?,?)`,
-      [profileId, company, position, start_date, end_date]
+      (profile_id, company, industry, location, position, start_date, end_date)
+      VALUES (?,?,?,?,?,?,?)`,
+      [
+        profileId,
+        company,
+        industry,
+        location,
+        position,
+        start_date,
+        end_date
+      ]
     );
 
     return result.insertId;
-
   }
 
   static async getJobs(profileId){
@@ -27,20 +41,33 @@ class EmploymentModel {
     );
 
     return rows;
-
   }
 
   static async updateJob(id, job){
 
-    const { company, position, start_date, end_date } = job;
+    const {
+      company,
+      industry,
+      location,
+      position,
+      start_date,
+      end_date
+    } = job;
 
     await db.execute(
       `UPDATE employment_history
-       SET company=?, position=?, start_date=?, end_date=?
+       SET company=?, industry=?, location=?, position=?, start_date=?, end_date=?
        WHERE id=?`,
-      [company, position, start_date, end_date, id]
+      [
+        company,
+        industry,
+        location,
+        position,
+        start_date,
+        end_date,
+        id
+      ]
     );
-
   }
 
   static async deleteJob(id){
@@ -49,9 +76,7 @@ class EmploymentModel {
       `DELETE FROM employment_history WHERE id=?`,
       [id]
     );
-
   }
-
 }
 
 export default EmploymentModel;

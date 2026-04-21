@@ -22,21 +22,28 @@ const router = express.Router();
  *               company:
  *                 type: string
  *                 example: Google
+ *               industry:
+ *                 type: string
+ *                 example: Technology
+ *               location:
+ *                 type: string
+ *                 example: Colombo, Sri Lanka
  *               position:
  *                 type: string
  *                 example: Software Engineer
  *               start_date:
  *                 type: string
  *                 format: date
+ *                 example: 2024-01-01
  *               end_date:
  *                 type: string
  *                 format: date
+ *                 example: 2025-01-01
  *     responses:
  *       201:
  *         description: Job added successfully
  */
 router.post("/", authMiddleware, EmploymentController.addJob);
-
 
 /**
  * @swagger
@@ -51,7 +58,6 @@ router.post("/", authMiddleware, EmploymentController.addJob);
  *         description: Returns employment history
  */
 router.get("/", authMiddleware, EmploymentController.getJobs);
-
 
 /**
  * @swagger
@@ -78,6 +84,12 @@ router.get("/", authMiddleware, EmploymentController.getJobs);
  *               company:
  *                 type: string
  *                 example: Google
+ *               industry:
+ *                 type: string
+ *                 example: Finance
+ *               location:
+ *                 type: string
+ *                 example: London, UK
  *               position:
  *                 type: string
  *                 example: Senior Software Engineer
@@ -94,7 +106,6 @@ router.get("/", authMiddleware, EmploymentController.getJobs);
  *         description: Job updated successfully
  */
 router.put("/:id", authMiddleware, EmploymentController.updateJob);
-
 
 /**
  * @swagger
