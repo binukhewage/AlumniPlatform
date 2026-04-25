@@ -39,6 +39,7 @@ const options = {
         {
           //appplying jwt globally (can override per route if needed)
           bearerAuth: [],
+          ApiKeyAuth: [],
         },
       ],
     },

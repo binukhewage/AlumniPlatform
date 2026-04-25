@@ -4,28 +4,30 @@ import db from "../config/db.js";
 
 class AnalyticsService {
   static buildProfileFilter(filters = {}) {
-    let joins = "";
-    let where = "WHERE 1=1";
-    const params = [];
+  let joins = " JOIN users u ON u.id = p.user_id ";
+  let where = "WHERE u.role = 'user'";
+  const params = [];
 
-    if (filters.year) {
-      joins += " JOIN degrees d_year ON p.id = d_year.profile_id";
-      where += " AND YEAR(d_year.completion_date) = ?";
-      params.push(filters.year);
-    }
-    if (filters.programme) {
-      joins += " JOIN degrees d_prog ON p.id = d_prog.profile_id";
-      where += " AND d_prog.degree_name = ?";
-      params.push(filters.programme);
-    }
-    if (filters.industry) {
-      joins += " JOIN employment_history e_ind ON p.id = e_ind.profile_id";
-      where += " AND e_ind.industry = ?";
-      params.push(filters.industry);
-    }
-
-    return { joins, where, params };
+  if (filters.year) {
+    joins += " JOIN degrees d_year ON p.id = d_year.profile_id";
+    where += " AND YEAR(d_year.completion_date) = ?";
+    params.push(filters.year);
   }
+
+  if (filters.programme) {
+    joins += " JOIN degrees d_prog ON p.id = d_prog.profile_id";
+    where += " AND d_prog.degree_name = ?";
+    params.push(filters.programme);
+  }
+
+  if (filters.industry) {
+    joins += " JOIN employment_history e_ind ON p.id = e_ind.profile_id";
+    where += " AND e_ind.industry = ?";
+    params.push(filters.industry);
+  }
+
+  return { joins, where, params };
+}
 
   // Filter Options
   static async getFilterOptions() {

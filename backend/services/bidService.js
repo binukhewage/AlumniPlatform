@@ -157,7 +157,15 @@ class BidService {
       );
     }
 
-    return { status: "updated" };
+    // Get final status of this bid
+    const [updatedBid] = await db.execute(
+      `SELECT status FROM bids WHERE id = ?`,
+      [bidId]
+    );
+
+    const finalStatus = updatedBid[0]?.status;
+
+    return { status: finalStatus };
   }
 
   // ---------------- GET CURRENT BID ----------------

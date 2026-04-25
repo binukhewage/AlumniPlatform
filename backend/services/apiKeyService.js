@@ -4,14 +4,14 @@ import ApiKeyModel from "../models/apiKeyModel.js";
 class ApiKeyService {
 
   //  GENERATE KEY
-  static async generateKey(name) {
+  static async generateKey(name, permissions = "*") {
 
     // Generate a secure random key (32 bytes → hex string)
     const key = crypto.randomBytes(32).toString("hex");
 
-    await ApiKeyModel.create(name, key);
+    await ApiKeyModel.create(name, key, permissions);
 
-    return { name, api_key: key };
+    return { name, permissions, api_key: key };
   }
 
   // GET ALL KEYS (LIST)

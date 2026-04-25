@@ -26,14 +26,17 @@ const BidSection = () => {
     }
   };
 
+  useEffect(() => {
+    loadBid();
+  }, []);
+
   const placeBid = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await api.post("/bids", { bid_amount: amount });
-      setStatus(res.data.status);
       setAmount("");
-      loadBid();
+      await loadBid();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to place bid");
     } finally {
@@ -46,9 +49,8 @@ const BidSection = () => {
     setLoading(true);
     try {
       const res = await api.put(`/bids/${bid.id}`, { bid_amount: amount });
-      setStatus(res.data.status);
       setAmount("");
-      loadBid();
+      await loadBid();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to increase bid");
     } finally {
@@ -65,7 +67,7 @@ const BidSection = () => {
       await api.delete(`/bids/${bid.id}`);
       setBid(null);
       setStatus("");
-      loadBid();
+      await loadBid();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to cancel bid");
     } finally {

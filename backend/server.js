@@ -19,6 +19,7 @@ import publicRoutes from "./routes/publicRoutes.js";
 import apiKeyRoutes from "./routes/apiKeyRoutes.js";
 import apiKeyMiddleware from "./middleware/apiKeyMiddleware.js";
 import allowRoles from "./middleware/roleMiddleware.js";
+import { requirePermission } from "./middleware/permissionMiddleware.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import alumniRoutes from "./routes/alumniRoutes.js";
 
@@ -31,20 +32,23 @@ dotenv.config();
 const app = express();
 
 // ✅ Allow cross-origin image loading
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
 app.use(cors());
 app.use(express.json());
 
-// ---------- RATE LIMITING ----------------- // 
+// ---------- RATE LIMITING ----------------- //
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   message: {
-    error: "Too many requests, please try again later"
-  }
+    error: "Too many requests, please try again later",
+  },
 });
 
 /* ---------------- DATABASE CONNECTION ---------------- */
@@ -62,45 +66,65 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-
 app.get("/", (req, res) => {
   res.json({ message: "Alumni Platform API Running" });
 });
 
-
 app.use("/api/auth", limiter, authRoutes);
 
-// PROTECTED TEST ROUTE 
+// PROTECTED TEST ROUTE
 
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({
     message: "You accessed a protected route",
-    user: req.user
+    user: req.user,
   });
 });
 
-app.use("/api/profile",  profileRoutes);
-app.use("/api/degrees",  degreeRoutes);
-app.use("/api/certifications",  certificationRoutes);
-app.use("/api/licences",  licenceRoutes);
-app.use("/api/courses",  courseRoutes);
-app.use("/api/employment", employmentRoutes);
-app.use("/api/bids", limiter, bidRoutes);
-app.use("/api/public", apiKeyMiddleware, publicRoutes);
-app.use("/api/alumni", alumniRoutes);
+// JWT Routes (normal logged in users)
+app.use("/api/profile", authMiddleware, profileRoutes);
+app.use("/api/degrees", authMiddleware, degreeRoutes);
+app.use("/api/certifications", authMiddleware, certificationRoutes);
+app.use("/api/licences", authMiddleware, licenceRoutes);
+app.use("/api/courses", authMiddleware, courseRoutes);
+app.use("/api/employment", authMiddleware, employmentRoutes);
+
+// API Key Protected Routes
+app.use(
+  "/api/alumni",
+  apiKeyMiddleware,
+  requirePermission("read:alumni"),
+  alumniRoutes
+);
+
+app.use(
+  "/api/bids",
+  limiter,
+  bidRoutes
+);
+
+app.use(
+  "/api/public",
+  apiKeyMiddleware,
+  requirePermission("read:alumni_of_day"),
+  publicRoutes
+);
 
 // Developer Only
 app.use(
   "/api/api-keys",
   authMiddleware,
-  allowRoles("developer"), 
+  allowRoles("developer"),
   apiKeyRoutes
 );
 
+// Analytics (Admin Only)
 app.use(
   "/api/analytics",
   authMiddleware,
   allowRoles("admin"),
+  apiKeyMiddleware,
+  requirePermission("read:analytics"),
   analyticsRoutes
 );
 

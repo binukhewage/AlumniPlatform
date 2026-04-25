@@ -1,6 +1,5 @@
 import express from "express";
 import AlumniController from "../controllers/alumniController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -11,11 +10,11 @@ const router = express.Router();
  *     summary: Get all alumni profiles
  *     tags: [Alumni]
  *     security:
- *       - bearerAuth: []
+ *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Alumni list returned successfully
  */
-router.get("/", authMiddleware, AlumniController.getAll);
+router.get("/", AlumniController.getAll);
 
 export default router;

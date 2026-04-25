@@ -3,10 +3,10 @@ import db from "../config/db.js";
 class ApiKeyModel {
 
   //  CREATE API KEY
-  static async create(name, key) {
+  static async create(name, key, permissions = "*") {
     const [result] = await db.execute(
-      "INSERT INTO api_keys (name, key_value) VALUES (?, ?)",
-      [name, key]
+      "INSERT INTO api_keys (name, key_value, permissions) VALUES (?, ?, ?)",
+      [name, key, permissions]
     );
 
     return result.insertId;
@@ -18,6 +18,7 @@ class ApiKeyModel {
       `SELECT 
          id, 
          name, 
+         permissions,
          created_at 
        FROM api_keys`
     );
@@ -62,6 +63,7 @@ class ApiKeyModel {
          id,
          name,
          key_value,
+         permissions,
          is_active,
          usage_count,
          created_at,

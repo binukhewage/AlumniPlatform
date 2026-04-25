@@ -18,6 +18,9 @@ const router = express.Router();
  *   get:
  *     summary: Get dashboard filter options
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Filter options returned successfully
@@ -32,6 +35,9 @@ router.get("/filter-options", AnalyticsController.getFilterOptions);
  *   get:
  *     summary: Get dashboard summary cards
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Summary data returned successfully
@@ -46,6 +52,9 @@ router.get("/summary", AnalyticsController.getSummary);
  *   get:
  *     summary: Get curriculum skill gap radar chart data
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Skills gap data returned successfully
@@ -60,6 +69,9 @@ router.get("/skills-gap", AnalyticsController.getSkillsGap);
  *   get:
  *     summary: Get employment by industry sector chart data
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Employment sector data returned successfully
@@ -77,6 +89,9 @@ router.get(
  *   get:
  *     summary: Get most common alumni job titles
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Job titles returned successfully
@@ -91,6 +106,9 @@ router.get("/job-titles", AnalyticsController.getJobTitles);
  *   get:
  *     summary: Get top employers hiring alumni
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Top employers returned successfully
@@ -105,6 +123,9 @@ router.get("/top-employers", AnalyticsController.getTopEmployers);
  *   get:
  *     summary: Get geographic distribution of alumni
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Geographic data returned successfully
@@ -122,6 +143,9 @@ router.get(
  *   get:
  *     summary: Get industry demand by sector
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Sector demand data returned successfully
@@ -136,6 +160,9 @@ router.get("/sector-demand", AnalyticsController.getSectorDemand);
  *   get:
  *     summary: Get certification growth trend data
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Certification data returned successfully
@@ -150,6 +177,9 @@ router.get("/certifications", AnalyticsController.getCertifications);
  *   get:
  *     summary: Get professional development courses popularity
  *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *         ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Course popularity data returned successfully

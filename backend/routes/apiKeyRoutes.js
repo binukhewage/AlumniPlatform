@@ -17,10 +17,14 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - name
+ *               - permissions
  *             properties:
  *               name:
  *                 type: string
- *                 example: Frontend App
+ *                 example: AR App
+ *               permissions:
+ *                 type: string
+ *                 example: read:alumni,read:alumni_of_day
  *     responses:
  *       201:
  *         description: API key generated successfully

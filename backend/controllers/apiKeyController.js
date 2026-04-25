@@ -5,9 +5,9 @@ class ApiKeyController {
   // CREATE KEY (GEnerate new key for developer / user)
   static async createKey(req, res) {
     try {
-      const { name } = req.body;
+      const { name, permissions } = req.body;
 
-      const key = await ApiKeyService.generateKey(name);
+      const key = await ApiKeyService.generateKey(name, permissions);
 
       res.status(201).json(key);
     } catch (error) {
@@ -58,6 +58,7 @@ class ApiKeyController {
         id: key.id,
         name: key.name,
         key: key.key_value,
+        permissions: key.permissions,
         is_active: key.is_active,
         is_revoked: key.revoked_at !== null,
         usage_count: key.usage_count,

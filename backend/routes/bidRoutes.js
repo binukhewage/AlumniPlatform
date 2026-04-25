@@ -12,7 +12,6 @@ const router = express.Router();
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
- *       - ApiKeyAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -42,7 +41,6 @@ router.post("/", authMiddleware, BidController.placeBid);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
- *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -79,7 +77,6 @@ router.put("/:id", authMiddleware, BidController.updateBid);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
- *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: Returns user's current bid
@@ -110,7 +107,6 @@ router.get("/my-bid", authMiddleware, BidController.getMyBid);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
- *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: List of past bids
@@ -141,7 +137,6 @@ router.get("/history", authMiddleware, BidController.getBidHistory);
  *     tags: [Bidding]
  *     security:
  *       - bearerAuth: []
- *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: id

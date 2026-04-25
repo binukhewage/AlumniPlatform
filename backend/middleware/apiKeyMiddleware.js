@@ -26,6 +26,7 @@ const apiKeyMiddleware = async (req, res, next) => {
   //  ADD THIS (FRONTEND KEY BYPASS FOR FEATURED ALUMNI SHOW )
   //allows Frontend to  access API without DB check 
   if (key === process.env.FRONTEND_API_KEY) {
+    req.apiKey = { name: 'Frontend', permissions: '*' };
     return next();
   }
 
@@ -37,6 +38,8 @@ const apiKeyMiddleware = async (req, res, next) => {
       error: "Invalid or revoked API key"  //if key invalid or revoked throw the error 
     });
   }
+
+  req.apiKey = record; // Attach the record (with permissions) to req
 
   //  increment usage (Track Usage)
   await ApiKeyModel.incrementUsage(record.id);
