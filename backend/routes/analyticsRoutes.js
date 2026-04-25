@@ -14,6 +14,20 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /analytics/filter-options:
+ *   get:
+ *     summary: Get dashboard filter options
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Filter options returned successfully
+ *       500:
+ *         description: Server error
+ */
+router.get("/filter-options", AnalyticsController.getFilterOptions);
+
+/**
+ * @swagger
  * /analytics/summary:
  *   get:
  *     summary: Get dashboard summary cards
