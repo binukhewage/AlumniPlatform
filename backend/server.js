@@ -100,7 +100,7 @@ app.use(
 app.use(
   "/api/analytics",
   authMiddleware,
-  allowRoles("developer"),
+  allowRoles("admin"),
   analyticsRoutes
 );
 

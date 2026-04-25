@@ -16,6 +16,10 @@ class AlumniModel {
         e.industry
       FROM profiles p
 
+      INNER JOIN users u
+        ON u.id = p.user_id
+       AND u.role = 'user'
+
       LEFT JOIN degrees d
         ON d.profile_id = p.id
 
