@@ -31,7 +31,7 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Allow cross-origin image loading
+// Allow cross-origin image loading
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
