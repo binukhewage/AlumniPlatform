@@ -1,7 +1,10 @@
 -- ========================================
 -- Alumni Influencer Platform DB Schema
--- FINAL VERSION (PRODUCTION READY)
 -- ========================================
+
+DROP DATABASE IF EXISTS alumni_platform;
+CREATE DATABASE alumni_platform;
+USE alumni_platform;
 
 -- ========================
 -- USERS
@@ -11,7 +14,7 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   is_verified TINYINT(1) DEFAULT 0,
-  role ENUM('user','developer') DEFAULT 'user',
+  role ENUM('user','developer','admin') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -134,6 +137,7 @@ CREATE TABLE employment_history (
   position VARCHAR(255) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE,
+  location VARCHAR(255),
 
   FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE,
   INDEX (profile_id),
@@ -195,4 +199,47 @@ CREATE TABLE token_blacklist (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   INDEX (token(255))
+);
+
+-- =====================================================
+-- DEFAULT SYSTEM ACCOUNTS
+-- Password for both accounts: Admin123@
+-- (bcrypt hash from your current DB)
+-- =====================================================
+
+INSERT INTO users (email, password, is_verified, role)
+VALUES
+(
+  'dev@my.westminster.ac.uk',
+  '$2b$10$Ek.cfNXmazZEACGLVy7ynuLxYaPKL...',
+  1,
+  'developer'
+),
+(
+  'admin@my.westminster.ac.uk',
+  '$2b$10$9XuM6Bv.8v87hhTb8TNqZe5gOhUWr6...',
+  1,
+  'admin'
+);
+
+-- =====================================================
+-- OPTIONAL DEFAULT API KEYS
+-- =====================================================
+
+INSERT INTO api_keys (name, key_value, permissions)
+VALUES
+(
+  'Frontend App',
+  'frontend-key-demo-123',
+  '*'
+),
+(
+  'AR App',
+  'ar-app-demo-123',
+  'read:alumni,read:alumni_of_day'
+),
+(
+  'Analytics Dashboard',
+  'analytics-demo-123',
+  'read:analytics'
 );

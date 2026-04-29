@@ -21,9 +21,9 @@ import {
 } from "recharts";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
-import Papa from "papaparse";
+import { jsPDF } from "jspdf";                      //generate pdf
+import html2canvas from "html2canvas";  //html into image 
+import Papa from "papaparse";  //json to csv
 
 const COLORS = [
   "#2563eb",
@@ -191,6 +191,7 @@ const AnalyticsDashboard = () => {
         api.get("/analytics/courses-popularity", config),
       ]);
 
+      // store results in state 
       setSummary(summaryRes.data || {});
       setSkillsGapData(skillsRes.data || []);
       setEmploymentData(employmentRes.data || []);
@@ -418,6 +419,8 @@ const AnalyticsDashboard = () => {
           </div>
         </section>
 
+        //charts 
+
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-xl shadow-sm border p-5">
             <h3 className="font-semibold mb-4">Curriculum Skill Gap Analysis</h3>
@@ -517,7 +520,7 @@ const AnalyticsDashboard = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-5">
-            <h3 className="font-semibold mb-4">Certification Growth Trend (by Demand)</h3>
+            <h3 className="font-semibold mb-4">Certification Growth Trend (6 Months)</h3>
             <div className="h-[260px]">
               <ResponsiveContainer>
                 <LineChart data={certificationData}>

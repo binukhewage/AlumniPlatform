@@ -248,44 +248,84 @@ class AnalyticsService {
     return rows;
   }
 
-  // 7 Certification Growth
-  static async getCertifications(filters = {}) {
-    const { joins, where, params } = this.buildProfileFilter(filters);
+  // 7 Certification Growth (Last 6 Months)
+static async getCertifications(filters = {}) {
+  const { joins, where, params } = this.buildProfileFilter(filters);
 
-    const [rows] = await db.execute(`
-      SELECT DATE_FORMAT(c.completion_date, '%Y-%m') AS name, c.certification_name
-      FROM profiles p
-      JOIN certifications c ON p.id = c.profile_id
-      ${joins}
-      ${where} AND c.completion_date IS NOT NULL
-      ORDER BY c.completion_date ASC
-    `, params);
+  const [rows] = await db.execute(`
+    SELECT 
+      DATE_FORMAT(c.completion_date, '%Y-%m') AS name,
+      c.certification_name
+    FROM profiles p
+    JOIN certifications c ON p.id = c.profile_id
+    ${joins}
+    ${where}
+      AND c.completion_date IS NOT NULL
+      AND c.completion_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    ORDER BY c.completion_date ASC
+  `, params);
 
-    const monthlyData = {};
+  // Create last 6 months with zero values first
+  const monthlyData = {};
 
-    rows.forEach(row => {
-      const month = row.name;
-      const cert = (row.certification_name || "").toLowerCase();
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
 
-      if (!monthlyData[month]) {
-        monthlyData[month] = { name: month, Cloud: 0, Agile: 0, Data: 0, Security: 0, Other: 0 };
-      }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const key = `${year}-${month}`;
 
-      if (cert.includes("aws") || cert.includes("azure") || cert.includes("gcp") || cert.includes("cloud")) {
-        monthlyData[month].Cloud++;
-      } else if (cert.includes("agile") || cert.includes("scrum") || cert.includes("pmp")) {
-        monthlyData[month].Agile++;
-      } else if (cert.includes("data") || cert.includes("analytics") || cert.includes("sql") || cert.includes("power")) {
-        monthlyData[month].Data++;
-      } else if (cert.includes("security") || cert.includes("cyber") || cert.includes("hack")) {
-        monthlyData[month].Security++;
-      } else {
-        monthlyData[month].Other++;
-      }
-    });
-
-    return Object.values(monthlyData).sort((a, b) => a.name.localeCompare(b.name));
+    monthlyData[key] = {
+      name: key,
+      Cloud: 0,
+      Agile: 0,
+      Data: 0,
+      Security: 0,
+      Other: 0,
+    };
   }
+
+  // Count certifications into categories
+  rows.forEach((row) => {
+    const month = row.name;
+    const cert = (row.certification_name || "").toLowerCase();
+
+    if (!monthlyData[month]) return;
+
+    if (
+      cert.includes("aws") ||
+      cert.includes("azure") ||
+      cert.includes("gcp") ||
+      cert.includes("cloud")
+    ) {
+      monthlyData[month].Cloud++;
+    } else if (
+      cert.includes("agile") ||
+      cert.includes("scrum") ||
+      cert.includes("pmp")
+    ) {
+      monthlyData[month].Agile++;
+    } else if (
+      cert.includes("data") ||
+      cert.includes("analytics") ||
+      cert.includes("sql") ||
+      cert.includes("power bi")
+    ) {
+      monthlyData[month].Data++;
+    } else if (
+      cert.includes("security") ||
+      cert.includes("cyber") ||
+      cert.includes("hack")
+    ) {
+      monthlyData[month].Security++;
+    } else {
+      monthlyData[month].Other++;
+    }
+  });
+
+  return Object.values(monthlyData);
+}
 
   // 8 Courses Trend
   static async getCoursesPopularity(filters = {}) {
